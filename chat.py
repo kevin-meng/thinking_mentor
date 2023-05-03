@@ -65,8 +65,8 @@ with col2:
 if click:
     if len(user_input)>0:
         response = generate_response(user_input)
-        st.markdown(response)
-        st.markdown(type(response))
+        # st.markdown(response)
+        # st.markdown(type(response))
 
         try:
             text = eval(response.strip())
@@ -82,6 +82,7 @@ if click:
                 for line in text['反面']:
                     st.markdown("- " + line)
 
+            st.write("----")
             st.markdown("**" + text['结论'].strip() + "**")
 
         except:
