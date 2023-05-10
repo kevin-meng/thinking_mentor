@@ -10,11 +10,10 @@ use chatgpt to create a mentor help raise critique thought skill
 利用 chatGPT 来启发学生多维度看待问题，培养其批判性思维，提高问商。
 
 ## 项目成员:
-[kevin-meng](https://github.com/kevin-meng)
+[kevin-meng](https://github.com/kevin-meng) : 
 
 
-[JACOB152](https://github.com/JACOB152)
-
+[JACOB152](https://github.com/JACOB152) :
 
 ## 界面截图
 ![](./pic/screenshot.png)
@@ -52,10 +51,15 @@ streamlit run chat.py
 
 Once the script is started, you can go to the URL [http://localhost:8501](http://localhost:8501) to start using the bot.
 
+
+
 ## License
 
 This project is released under the [MIT License](LICENSE).
 
+## 致谢
 
+项目缘起于 datawhale 的 [《GPT从入门到应用 - Prompt使用指南》](https://linklearner.com/#/learn/brief/120) 大作业。
+课程很棒，感谢datawhale辛苦制作。
 
   
