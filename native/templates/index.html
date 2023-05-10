@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+<head>
+    <title>助思者 - 智能聊天机器人</title>
+    <style>
+            #header {
+                text-align: center;
+                margin: 30px 0;
+            }
+            #logo {
+                display: inline-block;
+                width: 100px;
+                height: 100px;
+                background-color: #f2f2f2;
+                border-radius: 50%;
+                margin-right: 20px;
+            }
+            #user-input {
+                width: 80%;
+                padding: 10px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            #input-btn {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            #pdf-btn {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-left: 10px;
+            }
+            #chatbot {
+                background-color: #f2f2f2;
+                padding: 10px;
+                border-radius: 5px;
+                min-height: 200px;
+                overflow-y: scroll;
+            }
+            .user {
+                color: #4CAF50;
+            }
+            .chatbot {
+                color: #333;
+            }
+            .response{
+                display:flex;
+
+            }
+            .left-align {
+                width:750px;
+                float:left;
+            }
+            .right-align {
+                width:750px;
+                float:right;
+            }
+            .left-alignn {
+                width:100%;
+                float:left;
+            }
+            .logo_positive {
+            width: 30px;
+            height: 30px;
+            margin-right: 5px;
+            }
+            .logo_negative {
+            width: 30px;
+            height: 30px;
+            margin-right: 5px;
+            }
+            .problem{
+            width:100%;
+            position:relative;
+
+
+            }
+
+    </style>
+</head>
+<body>
+<div id="header">
+    <img src="static/image/img.png" alt="助思者 Logo" id="logo">
+    <h1>助思者</h1>
+</div>
+<div id="input-container">
+    <input type="text" id="user-input" placeholder="请输入您的问题...">
+    <input type="button" value="发送" onclick="send_message()" id="input-btn">
+    <input type="file" value="从 PDF 读取" id="pdf-btn">
+    <button onclick="read_pdf()">Upload</button>
+</div>
+<div id="chatbot">
+    <p class="chatbot">您好！有什么可以帮您解决的问题吗？</p>
+    <div class="response">
+
+        <div id="response1" class="left-align"></div>
+
+        <div id="response2" class="right-align"></div>
+    </div>
+</div>
+<script>
+            function send_message() {
+                var user_input = document.getElementById("user-input").value;
+                send_message_pdf(user_input)
+            }
+            function send_message_pdf_two(pdf,chatbot_output) {
+                    var user_input = pdf;
+                    document.getElementById("user-input").value = user_input;
+                    var response1 = document.createElement("div");
+                    response1.classList.add("left-align");
+                    var response2 = document.createElement("div");
+                    response2.classList.add("right-align");
+
+                    var responses = [];
+                    var responseCount = 0;
+                    var processResponses = function() {
+                        // 等待两个请求都收到响应后再处理
+                        if (responseCount == 2) {
+                            response1.innerHTML = "<span class='response1'> <img src='static/image/positive.png' class='logo_positive' alt='正面助思者 Logo'> 正面助思者:</span> " + responses[0];
+                            response2.innerHTML = "<span class='response2'> <img src='static/image/negative.png' class='logo_negative' alt='正面助思者 Logo'> 反面助思者:</span> " + responses[1];
+                            document.getElementById("chatbot").appendChild(response1);
+                            document.getElementById("chatbot").appendChild(response2);
+                        }
+                    };
+                    var xhttp1 = new XMLHttpRequest();
+                    xhttp1.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            responses.push(this.responseText);
+                            responseCount++;
+                            processResponses();
+                        }
+                    };
+                    xhttp1.open("GET", "/get1", true);
+                    xhttp1.send();
+                    var xhttp2 = new XMLHttpRequest();
+                    xhttp2.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            responses.push(this.responseText);
+                            responseCount++;
+                            processResponses();
+                        }
+                    };
+                    xhttp2.open("GET", "/get2", true);
+                    xhttp2.send();
+            }
+            function send_message_pdf(pdf) {
+                var user_input = pdf;
+                document.getElementById("user-input").value = user_input;
+                var chatbot_output = document.createElement("div");
+                chatbot_output.classList.add("problem");
+                chatbot_output.innerHTML = "<div class='left-alignn'><span class='user'>您:</span> " + user_input + "</div>";
+                document.getElementById("chatbot").appendChild(chatbot_output);
+                document.getElementById("user-input").value = "";
+                var xhttp1 = new XMLHttpRequest();
+                xhttp1.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        send_message_pdf_two(pdf,chatbot_output);
+                    }
+                };
+                xhttp1.open("GET", "/get?msg=" + user_input, true);
+                xhttp1.send();
+
+            }
+
+             function read_pdf() {
+                // 解析 PDF 文件并将内容填充到输入框中
+                var file_input = document.getElementById("pdf-btn");
+                var file = file_input.files[0];
+                var form_data = new FormData();
+                form_data.append("pdf", file);
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        send_message_pdf(xhr.responseText);
+                    }
+                };
+                xhr.open("POST", "/read_pdf", true);
+                xhr.send(form_data);
+             }
+
+
+
+
+
+
+
+
+
+</script>
+</body>
